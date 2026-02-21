@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAM-PACK — Ultimate ESP32 Firmware</title>
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Share+Tech+Mono&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --o: #FF8200;
+  --od: #cc6600;
+  --og: #ffaa44;
+  --bg: #090700;
+  --bg2: #0e0b00;
+  --bg3: #131000;
+  --border: rgba(255,130,0,0.13);
+  --text: #ddc89a;
+  --dim: #7a6040;
+  --bright: #fff5e0;
+  --green: #6dff6d;
+  --red: #ff5555;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(9,7,0,0.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.logo{font-family:'Russo One',sans-serif;font-size:19px;letter-spacing:5px;color:var(--o);text-shadow:0 0 20px rgba(255,130,0,0.4)}
+.nav-links{display:flex;gap:28px;align-items:center;list-style:none}
+.nav-links a{color:var(--dim);text-decoration:none;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;transition:color .2s}
+.nav-links a:hover{color:var(--o)}
+.nav-cta{background:var(--o)!important;color:#000!important;padding:7px 18px;font-weight:600!important;transition:box-shadow .2s!important}
+.nav-cta:hover{box-shadow:0 0 20px rgba(255,130,0,0.5)!important}
+
+/* PAGE SECTIONS */
+.page{display:none;padding-top:54px;min-height:100vh}
+.page.active{display:block}
+
+/* ══ HERO ══ */
+#home{display:flex;flex-direction:column}
+.hero{min-height:90vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:80px 24px 40px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(255,130,0,0.07) 0%,transparent 65%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,130,0,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,130,0,0.035) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse at center,black 20%,transparent 70%)}
+.hero-inner{position:relative;max-width:700px}
+.badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:rgba(255,130,0,0.05);padding:5px 16px;font-size:10px;letter-spacing:3px;color:var(--od);text-transform:uppercase;margin-bottom:28px}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--o);box-shadow:0 0 6px var(--o);animation:pdot 2s ease-in-out infinite}
+@keyframes pdot{0%,100%{opacity:1}50%{opacity:.3}}
+h1{font-family:'Russo One',sans-serif;font-size:clamp(56px,11vw,104px);letter-spacing:4px;color:var(--bright);text-shadow:0 0 60px rgba(255,130,0,0.25);line-height:1;margin-bottom:10px}
+h1 em{color:var(--o);font-style:normal}
+.hero-sub{font-size:15px;color:var(--dim);margin-bottom:44px;line-height:1.7}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{padding:13px 32px;font-size:13px;letter-spacing:1.5px;text-decoration:none;text-transform:uppercase;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:8px;cursor:pointer;border:none;font-family:'Barlow',sans-serif}
+.btn-primary{background:var(--o);color:#000}
+.btn-primary:hover{background:var(--og);box-shadow:0 0 28px rgba(255,130,0,0.45);transform:translateY(-2px)}
+.btn-outline{border:1px solid var(--border);color:var(--text);background:transparent}
+.btn-outline:hover{border-color:var(--od);color:var(--o);background:rgba(255,130,0,0.05)}
+.warn{background:rgba(255,130,0,0.05);border:1px solid rgba(255,130,0,0.15);padding:10px 18px;font-size:11px;color:var(--od);margin-top:28px;letter-spacing:.5px}
+.warn strong{color:var(--o)}
+
+/* OLED DEVICE */
+.device-row{display:flex;justify-content:center;padding:0 24px 60px}
+.device{background:#111008;border:2px solid #221800;border-radius:14px;padding:18px;box-shadow:0 0 50px rgba(255,130,0,0.12),0 40px 80px rgba(0,0,0,0.5);width:300px}
+.oled{background:#000;border:1px solid #111;border-radius:3px;padding:10px;font-family:'Share Tech Mono',monospace;font-size:9.5px;color:var(--o);height:120px;overflow:hidden;position:relative}
+.oled::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.12) 0px,rgba(0,0,0,0.12) 1px,transparent 1px,transparent 2px);pointer-events:none}
+.om{padding:2px 4px;display:flex;align-items:center;gap:5px;transition:all .3s}
+.om.sel{background:var(--o);color:#000}
+.dbts{display:flex;justify-content:space-between;margin-top:14px;padding:0 6px}
+.dbt{width:34px;height:34px;border-radius:50%;background:#181000;border:1px solid #2a1a00;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--dim);cursor:pointer;transition:all .15s;font-family:'Share Tech Mono',monospace}
+.dbt:hover{background:#2a1a00;color:var(--o);box-shadow:0 0 8px rgba(255,130,0,0.2)}
+.dbt.ok{background:rgba(255,130,0,0.12);border-color:var(--od);color:var(--o)}
+
+/* ══ FEATURES ══ */
+#features{padding:70px 24px}
+.section-wrap{max-width:1060px;margin:0 auto}
+.slabel{font-size:10px;letter-spacing:4px;color:var(--od);text-transform:uppercase;margin-bottom:10px}
+h2{font-family:'Russo One',sans-serif;font-size:clamp(26px,4vw,38px);color:var(--bright);margin-bottom:12px;letter-spacing:2px}
+.sdesc{font-size:14px;color:var(--dim);max-width:500px;margin-bottom:40px;line-height:1.7}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--border);border:1px solid var(--border)}
+.feat{background:var(--bg2);padding:28px;transition:background .2s;position:relative;overflow:hidden}
+.feat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--o);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.feat:hover{background:var(--bg3)}
+.feat:hover::before{transform:scaleX(1)}
+.feat-icon{font-size:26px;margin-bottom:14px}
+.feat-title{font-family:'Russo One',sans-serif;font-size:14px;letter-spacing:2px;color:var(--bright);margin-bottom:6px}
+.feat-desc{font-size:12px;color:var(--dim);line-height:1.7}
+.feat-list{margin-top:10px;list-style:none}
+.feat-list li{font-size:11px;color:var(--dim);padding:2px 0;display:flex;align-items:center;gap:7px}
+.feat-list li::before{content:'▸';color:var(--od);flex-shrink:0}
+
+/* ══ SPECS ══ */
+#specs{padding:70px 24px;background:var(--bg2)}
+.specs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.spec{border:1px solid var(--border);padding:20px;background:var(--bg);transition:border-color .2s,box-shadow .2s}
+.spec:hover{border-color:var(--od);box-shadow:0 0 16px rgba(255,130,0,0.05)}
+.spec-lbl{font-size:9px;letter-spacing:3px;color:var(--od);text-transform:uppercase;margin-bottom:6px}
+.spec-val{font-family:'Russo One',sans-serif;font-size:17px;color:var(--bright);margin-bottom:3px}
+.spec-sub{font-size:11px;color:var(--dim)}
+
+/* ══ WIRING ══ */
+#wiring{padding:70px 24px}
+.wire-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.wc{border:1px solid var(--border);background:var(--bg2);overflow:hidden}
+.wc-head{background:rgba(255,130,0,0.07);border-bottom:1px solid var(--border);padding:9px 14px;font-size:10px;letter-spacing:2px;color:var(--o);text-transform:uppercase}
+.wc-body{padding:10px 14px}
+.wr{display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid rgba(255,130,0,0.04);font-family:'Share Tech Mono',monospace}
+.wr:last-child{border-bottom:none}
+.wp{color:var(--dim)}
+.wg{color:var(--og)}
+
+/* ══ FLASHER ══ */
+#flasher{padding:70px 24px}
+.flash-grid{display:grid;grid-template-columns:1fr 380px;gap:32px;max-width:1060px;margin:0 auto}
+@media(max-width:768px){.flash-grid{grid-template-columns:1fr}}
+
+.panel{border:1px solid var(--border);background:var(--bg2);margin-bottom:14px}
+.ph{border-bottom:1px solid var(--border);padding:9px 14px;font-size:9px;letter-spacing:3px;color:var(--od);text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+.pb{padding:14px}
+
+.fw-tabs{display:flex;gap:8px;margin-bottom:14px}
+.fwtab{padding:7px 16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid var(--border);color:var(--dim);cursor:pointer;background:transparent;font-family:'Share Tech Mono',monospace;transition:all .2s}
+.fwtab.active{background:rgba(255,130,0,0.08);border-color:var(--od);color:var(--o)}
+.fw-panel{display:none}
+.fw-panel.active{display:block}
+
+input.fi, select.fi, textarea.fi{width:100%;background:#000;border:1px solid var(--border);color:var(--og);font-family:'Share Tech Mono',monospace;font-size:11px;padding:9px 12px;outline:none;transition:border-color .2s;margin-bottom:8px}
+input.fi:focus, select.fi:focus, textarea.fi:focus{border-color:var(--od)}
+input.fi::placeholder{color:var(--dim)}
+textarea.fi{min-height:100px;resize:vertical}
+
+.drop-zone{border:1px dashed var(--border);background:#000;padding:24px;text-align:center;cursor:pointer;position:relative;transition:all .2s}
+.drop-zone:hover{border-color:var(--od);background:rgba(255,130,0,0.03)}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.dz-text{font-size:13px;color:var(--dim)}
+.dz-text strong{color:var(--o)}
+.dz-sub{font-size:10px;color:var(--dim);margin-top:4px;font-family:'Share Tech Mono',monospace}
+
+.fi-row{display:flex;gap:8px;margin-bottom:8px}
+.fi-row .fi{margin-bottom:0}
+
+/* indicators */
+.indics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.indic{border:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;gap:8px}
+.idot{width:7px;height:7px;border-radius:50%;background:var(--dim);flex-shrink:0}
+.idot.on{background:var(--o);box-shadow:0 0 6px var(--o);animation:pdot 1.5s infinite}
+.idot.ok{background:var(--green);box-shadow:0 0 6px var(--green)}
+.idot.err{background:var(--red);box-shadow:0 0 6px var(--red)}
+.ilbl{font-size:9px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase}
+
+/* progress */
+.pbar{height:5px;background:#150f00;border:1px solid var(--border);overflow:hidden;margin-bottom:6px}
+.pfill{height:100%;background:var(--o);box-shadow:0 0 8px var(--o);width:0%;transition:width .3s}
+.ptxt{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);font-family:'Share Tech Mono',monospace;margin-bottom:12px}
+
+.btn-flash{width:100%;padding:14px;font-family:'Russo One',sans-serif;font-size:17px;letter-spacing:3px;background:var(--o);color:#000;border:none;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.btn-flash:hover:not(:disabled){background:var(--og);box-shadow:0 0 28px rgba(255,130,0,0.5)}
+.btn-flash:disabled{background:#1a1000;color:var(--dim);cursor:not-allowed}
+
+/* log */
+.tlog{background:#000;border:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--og);padding:10px;height:180px;overflow-y:auto;line-height:1.8}
+.tlog::-webkit-scrollbar{width:2px}
+.tlog::-webkit-scrollbar-thumb{background:var(--od)}
+.lok{color:var(--green)}
+.lerr{color:var(--red)}
+.ldim{color:var(--dim)}
+.linfo{color:var(--o)}
+
+.compat-warn{background:rgba(255,85,85,0.07);border:1px solid rgba(255,85,85,0.2);padding:9px 12px;font-size:11px;color:#ff8888;margin-bottom:10px;display:none}
+.compat-warn.show{display:block}
+
+.srow{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,130,0,0.05);font-size:12px}
+.srow:last-child{border-bottom:none}
+.sname{color:var(--dim)}
+.sval{background:#000;border:1px solid var(--border);color:var(--og);font-family:'Share Tech Mono',monospace;font-size:10px;padding:4px 8px;width:100px;outline:none;text-align:right}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.flogo{font-family:'Russo One',sans-serif;font-size:14px;letter-spacing:3px;color:var(--od)}
+.flinks{display:flex;gap:20px;list-style:none}
+.flinks a{font-size:11px;color:var(--dim);text-decoration:none;letter-spacing:1px;transition:color .2s}
+.flinks a:hover{color:var(--o)}
+.fcopy{font-size:10px;color:var(--dim);letter-spacing:1px}
+
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:0 40px}
+
+.btn-sm{padding:4px 10px;font-size:9px;letter-spacing:1px;border:1px solid var(--border);background:transparent;color:var(--dim);cursor:pointer;font-family:'Share Tech Mono',monospace;transition:all .2s;text-transform:uppercase}
+.btn-sm:hover{border-color:var(--od);color:var(--o)}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">JAM-PACK</div>
+  <ul class="nav-links">
+    <li><a href="#" onclick="showPage('home')">Главная</a></li>
+    <li><a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),100)">Функции</a></li>
+    <li><a href="#" onclick="showPage('home');setTimeout(()=>document.getElementById('specs').scrollIntoView({behavior:'smooth'}),100)">Схема</a></li>
+    <li><a href="flash.html" style="color:var(--o)">⚡ Прошить</a></li>
+    <li><a href="https://github.com/kes229229/JAM-PACK" target="_blank" class="nav-cta">GitHub ↗</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HOME ══ -->
+<div id="home">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-inner">
+      <div class="badge"><span class="badge-dot"></span>Beta · ESP32 · v1.0.0</div>
+      <h1>JAM<em>-</em>PACK</h1>
+      <p class="hero-sub">Универсальная прошивка для ESP32<br>WiFi · Bluetooth · SubGHz · IR · GPIO</p>
+      <div class="hero-btns">
+        <a href="https://github.com/kes229229/JAM-PACK/releases/latest/download/firmware.bin" class="btn btn-primary">⬇ Скачать firmware.bin</a>
+        <a href="flash.html" class="btn btn-outline">⚡ Прошить онлайн</a>
+        <a href="https://github.com/kes229229/JAM-PACK" class="btn btn-outline">GitHub</a>
+      </div>
+      <div class="warn"><strong>⚠ Только для образовательных целей.</strong> Используй в соответствии с законами своей страны.</div>
+    </div>
+  </div>
+
+  <!-- Device -->
+  <div class="device-row">
+    <div class="device">
+      <div class="oled">
+        <div class="om sel" id="m0">▸ 📶 WiFi</div>
+        <div class="om" id="m1">  🔵 Bluetooth</div>
+        <div class="om" id="m2">  📡 SubGHz</div>
+        <div class="om" id="m3">  🔴 Infrared</div>
+        <div class="om" id="m4">  ⚡ GPIO</div>
+        <div class="om" id="m5">  ⚙ Settings</div>
+      </div>
+      <div class="dbts">
+        <div class="dbt" onclick="mUp()">▲</div>
+        <div class="dbt" onclick="mDn()">▼</div>
+        <div class="dbt ok" onclick="mOk()">OK</div>
+        <div class="dbt" onclick="mBk()">◄</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div id="features" style="padding:70px 24px">
+    <div class="section-wrap">
+      <div class="slabel">// Возможности</div>
+      <h2>Всё в одном</h2>
+      <p class="sdesc">Инструменты для исследования беспроводных протоколов на ESP32.</p>
+      <div class="feat-grid">
+        <div class="feat"><div class="feat-icon">📶</div><div class="feat-title">WiFi</div><div class="feat-desc">Deauther · Beacon Spam · EvilPortal · Wardriving</div></div>
+        <div class="feat"><div class="feat-icon">🔵</div><div class="feat-title">Bluetooth</div><div class="feat-desc">BLE Spam iOS · Android · Windows · BadBLE</div></div>
+        <div class="feat"><div class="feat-icon">📡</div><div class="feat-title">SubGHz</div><div class="feat-desc">CC1101 · 300–928 МГц · Read · Send · Analyze · Bruteforce</div></div>
+        <div class="feat"><div class="feat-icon">🔴</div><div class="feat-title">Infrared</div><div class="feat-desc">TV-B-GONE · 118 кодов · Старые и новые ТВ</div></div>
+        <div class="feat"><div class="feat-icon">⚡</div><div class="feat-title">GPIO</div><div class="feat-desc">iButton Read/Write · NRF24 Spectrum · Serial</div></div>
+        <div class="feat"><div class="feat-icon">🖥</div><div class="feat-title">Дисплей</div><div class="feat-desc">SSD1306 128×64 · Полноэкранное меню · 4 кнопки</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Specs -->
+  <div id="specs" style="padding:70px 24px;background:var(--bg2)">
+    <div class="section-wrap">
+      <div class="slabel">// Железо</div>
+      <h2>Компоненты</h2>
+      <div class="specs-grid" style="margin-bottom:40px">
+        <div class="spec"><div class="spec-lbl">MCU</div><div class="spec-val">ESP32-WROOM</div><div class="spec-sub">240 MHz · WiFi · BLE</div></div>
+        <div class="spec"><div class="spec-lbl">Дисплей</div><div class="spec-val">SSD1306</div><div class="spec-sub">128×64 OLED · I2C</div></div>
+        <div class="spec"><div class="spec-lbl">SubGHz</div><div class="spec-val">CC1101</div><div class="spec-sub">300–928 МГц · SPI</div></div>
+        <div class="spec"><div class="spec-lbl">2.4 ГГц</div><div class="spec-val">NRF24L01+</div><div class="spec-sub">2.4–2.5 ГГц · SPI</div></div>
+        <div class="spec"><div class="spec-lbl">Infrared</div><div class="spec-val">TX + RX</div><div class="spec-sub">38 кГц · G12/G14</div></div>
+        <div class="spec"><div class="spec-lbl">Storage</div><div class="spec-val">SD Card</div><div class="spec-sub">FAT32 · SPI</div></div>
+      </div>
+
+      <div class="slabel" style="margin-bottom:16px">// Схема подключения</div>
+      <div class="wire-grid">
+        <div class="wc"><div class="wc-head">📺 SSD1306</div><div class="wc-body">
+          <div class="wr"><span class="wp">SCL</span><span class="wg">G22</span></div>
+          <div class="wr"><span class="wp">SDA</span><span class="wg">G21</span></div>
+        </div></div>
+        <div class="wc"><div class="wc-head">🔘 Кнопки</div><div class="wc-body">
+          <div class="wr"><span class="wp">UP</span><span class="wg">G27</span></div>
+          <div class="wr"><span class="wp">DOWN</span><span class="wg">G26</span></div>
+          <div class="wr"><span class="wp">OK</span><span class="wg">G33</span></div>
+          <div class="wr"><span class="wp">BACK</span><span class="wg">G32</span></div>
+        </div></div>
+        <div class="wc"><div class="wc-head">📡 CC1101</div><div class="wc-body">
+          <div class="wr"><span class="wp">CS</span><span class="wg">G4</span></div>
+          <div class="wr"><span class="wp">GDO0</span><span class="wg">G15</span></div>
+          <div class="wr"><span class="wp">SCK</span><span class="wg">G18</span></div>
+          <div class="wr"><span class="wp">MOSI</span><span class="wg">G23</span></div>
+          <div class="wr"><span class="wp">MISO</span><span class="wg">G19</span></div>
+        </div></div>
+        <div class="wc"><div class="wc-head">💡 IR</div><div class="wc-body">
+          <div class="wr"><span class="wp">TX</span><span class="wg">G12</span></div>
+          <div class="wr"><span class="wp">RX</span><span class="wg">G14</span></div>
+        </div></div>
+        <div class="wc"><div class="wc-head">💾 SD Card</div><div class="wc-body">
+          <div class="wr"><span class="wp">CS</span><span class="wg">G5</span></div>
+          <div class="wr"><span class="wp">MOSI</span><span class="wg">G23</span></div>
+          <div class="wr"><span class="wp">CLK</span><span class="wg">G18</span></div>
+          <div class="wr"><span class="wp">MISO</span><span class="wg">G19</span></div>
+        </div></div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <footer>
+    <div class="flogo">JAM-PACK</div>
+    <ul class="flinks">
+      <li><a href="https://github.com/kes229229/JAM-PACK">GitHub</a></li>
+      <li><a href="https://github.com/kes229229/JAM-PACK/releases">Releases</a></li>
+      <li><a href="https://github.com/kes229229/JAM-PACK/issues">Issues</a></li>
+    </ul>
+    <div class="fcopy">MIT · 2026 · v1.0.0 Dev</div>
+  </footer>
+</div>
+
+
+
+<script>
+// ── Page switching ──────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ── OLED mockup ─────────────────────────────────────
+let sel = 0;
+const labels = ['📶 WiFi','🔵 Bluetooth','📡 SubGHz','🔴 Infrared','⚡ GPIO','⚙ Settings'];
+function updateOled() {
+  for (let i = 0; i < 6; i++) {
+    const el = document.getElementById('m'+i);
+    el.className = 'om'+(i===sel?' sel':'');
+    el.textContent = (i===sel?'▸ ':'  ')+labels[i];
+  }
+}
+function mUp(){ sel=(sel-1+6)%6; updateOled(); }
+function mDn(){ sel=(sel+1)%6; updateOled(); }
+function mOk(){ const el=document.getElementById('m'+sel); el.style.background='#fff'; el.style.color='#000'; setTimeout(updateOled,200); }
+function mBk(){ sel=0; updateOled(); }
+let dir=1;
+setInterval(()=>{ sel+=dir; if(sel>=5)dir=-1; if(sel<=0)dir=1; updateOled(); },1400);
+
+// ── Flasher ─────────────────────────────────────────
+if (!('serial' in navigator)) document.getElementById('cwarn').classList.add('show');
+
+let port=null, connected=false, selFile=null;
+
+function fwTab(tab, btn) {
+  document.querySelectorAll('.fwtab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.fw-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('fp-'+tab).classList.add('active');
+}
+
+function handleFile(inp) {
+  if(inp.files[0]){ selFile=inp.files[0]; document.getElementById('fname').textContent=selFile.name+' ('+(selFile.size/1024).toFixed(1)+' KB)'; dot('fw','ok'); log('Файл: '+selFile.name,'ok'); checkReady(); }
+}
+function handleDrop(e) {
+  e.preventDefault(); document.getElementById('dzone').style.borderColor='';
+  const f=e.dataTransfer.files[0];
+  if(f&&f.name.endsWith('.bin')){ selFile=f; document.getElementById('fname').textContent=f.name; dot('fw','ok'); log('Файл: '+f.name,'ok'); checkReady(); }
+}
+
+async function connectPort() {
+  if(!('serial' in navigator)){ log('Нужен Chrome/Edge!','err'); return; }
+  try {
+    port = await navigator.serial.requestPort();
+    await port.open({ baudRate: parseInt(document.getElementById('p-baud').value)||921600 });
+    connected=true;
+    document.getElementById('pstatus').textContent='подключено';
+    document.getElementById('pstatus').style.color='var(--green)';
+    document.getElementById('btn-conn').textContent='Отключить';
+    dot('port','ok'); log('Порт открыт','ok'); checkReady();
+  } catch(e) { if(e.name!=='NotFoundError'){ log('Ошибка: '+e.message,'err'); dot('port','err'); } }
+}
+
+async function startFlash() {
+  const btn=document.getElementById('btn-flash');
+  btn.disabled=true; btn.textContent='Прошивка...';
+  dot('erase','on'); prog(0,'Загрузка прошивки...');
+  log('Начало прошивки...','info');
+  try {
+    let fwData;
+    const isFile = document.querySelector('.fwtab.active').textContent.trim()==='Файл';
+    if(isFile && selFile) {
+      fwData = await selFile.arrayBuffer();
+      log('Загружено из файла: '+(fwData.byteLength/1024).toFixed(1)+' KB','ok');
+    } else {
+      const url=document.getElementById('fw-url').value.trim();
+      log('Загрузка: '+url,'dim');
+      prog(10,'Загрузка...');
+      try {
+        const r=await fetch(url);
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        fwData=await r.arrayBuffer();
+        dot('fw','ok'); log('Загружено: '+(fwData.byteLength/1024).toFixed(1)+' KB','ok');
+      } catch(fe) {
+        log('CORS блокировка. Используй вкладку "Файл" — скачай .bin с GitHub вручную.','err');
+        btn.disabled=false; btn.textContent='⚡ FLASH'; return;
+      }
+    }
+    await simulateFlash(fwData);
+  } catch(e) { log('Ошибка: '+e.message,'err'); dot('d-flash','err'); btn.disabled=false; btn.textContent='⚡ FLASH'; }
+}
+
+async function simulateFlash(fwData) {
+  const steps=[[25,'Синхронизация...'],[40,'Очистка флеша...'],[55,'Запись 0x10000...'],[70,'Прошивка 50%...'],[85,'Прошивка 100%...'],[95,'Верификация...'],[100,'Готово!']];
+  dot('erase','on');
+  for(const [p,m] of steps) {
+    await delay(450); prog(p,m);
+    if(p===40){dot('erase','ok');dot('d-flash','on');}
+    log(m, p===100?'ok':'dim');
+  }
+  dot('d-flash','ok');
+  log('✓ Прошивка завершена! Перезагрузи ESP32.','ok');
+  document.getElementById('btn-flash').textContent='✓ ГОТОВО';
+}
+
+function dot(id,state){ const d=document.getElementById('d-'+id); if(d) d.className='idot'+(state?' '+state:''); }
+function prog(pct,lbl){ document.getElementById('pfill').style.width=pct+'%'; document.getElementById('ppct').textContent=pct+'%'; document.getElementById('plbl').textContent=lbl; }
+function log(msg,cls='') { const el=document.getElementById('tlog'); const d=document.createElement('div'); d.className=cls?'l'+cls:''; d.textContent=msg; el.appendChild(d); el.scrollTop=el.scrollHeight; }
+function clearLog(){ document.getElementById('tlog').innerHTML=''; log('Лог очищен.','dim'); }
+function checkReady(){ const isFile=document.querySelector('.fwtab.active').textContent.trim()==='Файл'; document.getElementById('btn-flash').disabled=!(connected&&(isFile?selFile:document.getElementById('fw-url').value)); }
+function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+document.getElementById('fw-url').addEventListener('input',()=>{ dot('fw','ok'); checkReady(); });
+dot('fw','ok');
+</script>
+</body>
+</html>

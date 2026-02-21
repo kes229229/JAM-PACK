@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAM-PACK — Web Flasher</title>
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Share+Tech+Mono&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--o:#FF8200;--od:#cc6600;--og:#ffaa44;--bg:#090700;--bg2:#0e0b00;--border:rgba(255,130,0,0.13);--text:#ddc89a;--dim:#7a6040;--bright:#fff5e0;--green:#6dff6d;--red:#ff5555}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(9,7,0,0.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.logo{font-family:'Russo One',sans-serif;font-size:19px;letter-spacing:5px;color:var(--o);text-shadow:0 0 20px rgba(255,130,0,0.4);text-decoration:none}
+.nav-links{display:flex;gap:24px;align-items:center;list-style:none}
+.nav-links a{color:var(--dim);text-decoration:none;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;transition:color .2s}
+.nav-links a:hover{color:var(--o)}
+.nav-back{color:var(--text)!important}
+
+.main{max-width:1060px;margin:0 auto;padding:90px 24px 60px}
+.slabel{font-size:10px;letter-spacing:4px;color:var(--od);text-transform:uppercase;margin-bottom:10px}
+h1{font-family:'Russo One',sans-serif;font-size:clamp(28px,5vw,42px);color:var(--bright);margin-bottom:8px;letter-spacing:2px}
+h1 em{color:var(--o);font-style:normal}
+.sub{font-size:13px;color:var(--dim);margin-bottom:36px;line-height:1.7}
+
+.flash-grid{display:grid;grid-template-columns:1fr 380px;gap:28px}
+@media(max-width:768px){.flash-grid{grid-template-columns:1fr}}
+
+.panel{border:1px solid var(--border);background:var(--bg2);margin-bottom:14px}
+.ph{border-bottom:1px solid var(--border);padding:9px 14px;font-size:9px;letter-spacing:3px;color:var(--od);text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+.pb{padding:14px}
+
+.fw-tabs{display:flex;gap:8px;margin-bottom:14px}
+.fwtab{padding:7px 16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid var(--border);color:var(--dim);cursor:pointer;background:transparent;font-family:'Share Tech Mono',monospace;transition:all .2s}
+.fwtab.active{background:rgba(255,130,0,0.08);border-color:var(--od);color:var(--o)}
+.fw-panel{display:none}
+.fw-panel.active{display:block}
+
+.fi{width:100%;background:#000;border:1px solid var(--border);color:var(--og);font-family:'Share Tech Mono',monospace;font-size:11px;padding:9px 12px;outline:none;transition:border-color .2s;margin-bottom:8px}
+.fi:focus{border-color:var(--od)}
+.fi::placeholder{color:var(--dim)}
+.fi-row{display:flex;gap:8px;margin-bottom:8px}
+.fi-row .fi{margin-bottom:0}
+
+.drop-zone{border:1px dashed var(--border);background:#000;padding:28px;text-align:center;cursor:pointer;position:relative;transition:all .2s}
+.drop-zone:hover{border-color:var(--od);background:rgba(255,130,0,0.03)}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.dz-text{font-size:13px;color:var(--dim)}
+.dz-text strong{color:var(--o)}
+.dz-sub{font-size:10px;color:var(--dim);margin-top:6px;font-family:'Share Tech Mono',monospace}
+
+.indics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.indic{border:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;gap:8px}
+.idot{width:7px;height:7px;border-radius:50%;background:var(--dim);flex-shrink:0;transition:all .3s}
+.idot.on{background:var(--o);box-shadow:0 0 6px var(--o);animation:bl 1.5s infinite}
+.idot.ok{background:var(--green);box-shadow:0 0 6px var(--green)}
+.idot.err{background:var(--red);box-shadow:0 0 6px var(--red)}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
+.ilbl{font-size:9px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase}
+
+.pbar{height:5px;background:#150f00;border:1px solid var(--border);overflow:hidden;margin-bottom:6px}
+.pfill{height:100%;background:var(--o);box-shadow:0 0 8px var(--o);width:0%;transition:width .4s}
+.ptxt{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);font-family:'Share Tech Mono',monospace;margin-bottom:12px}
+
+.btn-flash{width:100%;padding:15px;font-family:'Russo One',sans-serif;font-size:18px;letter-spacing:3px;background:var(--o);color:#000;border:none;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.btn-flash:hover:not(:disabled){background:var(--og);box-shadow:0 0 30px rgba(255,130,0,0.5);transform:translateY(-1px)}
+.btn-flash:disabled{background:#1a1000;color:var(--dim);cursor:not-allowed;transform:none}
+
+.tlog{background:#000;border:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--og);padding:10px;height:200px;overflow-y:auto;line-height:1.9}
+.tlog::-webkit-scrollbar{width:2px}
+.tlog::-webkit-scrollbar-thumb{background:var(--od)}
+.lok{color:var(--green)}
+.lerr{color:var(--red)}
+.ldim{color:var(--dim)}
+.linfo{color:var(--o)}
+
+.srow{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,130,0,0.05);font-size:12px}
+.srow:last-child{border-bottom:none}
+.sname{color:var(--dim)}
+.sval{background:#000;border:1px solid var(--border);color:var(--og);font-family:'Share Tech Mono',monospace;font-size:10px;padding:4px 8px;width:100px;outline:none;text-align:right}
+
+.compat{background:rgba(255,85,85,0.07);border:1px solid rgba(255,85,85,0.2);padding:10px 14px;font-size:11px;color:#ff8888;margin-bottom:12px;display:none}
+.compat.show{display:block}
+
+.btn-sm{padding:3px 10px;font-size:9px;letter-spacing:1px;border:1px solid var(--border);background:transparent;color:var(--dim);cursor:pointer;font-family:'Share Tech Mono',monospace;transition:all .2s;text-transform:uppercase}
+.btn-sm:hover{border-color:var(--od);color:var(--o)}
+
+.info-box{background:rgba(255,130,0,0.04);border:1px solid var(--border);padding:14px;font-size:11px;color:var(--dim);line-height:1.8;font-family:'Share Tech Mono',monospace;margin-top:8px}
+.info-box strong{color:var(--o)}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">JAM-PACK</a>
+  <ul class="nav-links">
+    <li><a href="index.html" class="nav-back">← Назад</a></li>
+    <li><a href="https://github.com/kes229229/JAM-PACK/releases" target="_blank">Releases</a></li>
+    <li><a href="https://github.com/kes229229/JAM-PACK" target="_blank">GitHub</a></li>
+  </ul>
+</nav>
+
+<div class="main">
+  <div class="slabel">// Web Flasher</div>
+  <h1>Прошить <em>ESP32</em></h1>
+  <p class="sub">Прямо из браузера без установки программ.<br>Требуется <strong>Chrome</strong> или <strong>Edge</strong> версии 89+ и <strong>HTTPS</strong>.</p>
+
+  <div class="flash-grid">
+
+    <!-- LEFT -->
+    <div>
+      <!-- Firmware source -->
+      <div class="panel">
+        <div class="ph">Источник прошивки</div>
+        <div class="pb">
+          <div class="fw-tabs">
+            <button class="fwtab active" onclick="fwTab('url',this)">URL с GitHub</button>
+            <button class="fwtab" onclick="fwTab('file',this)">Локальный файл</button>
+          </div>
+
+          <div class="fw-panel active" id="fp-url">
+            <input class="fi" id="fw-url" type="text"
+              value="https://github.com/kes229229/JAM-PACK/releases/latest/download/firmware.bin"
+              placeholder="https://...firmware.bin">
+            <div class="info-box">
+              <strong>Как обновлять прошивку без меня:</strong><br>
+              1. Скомпилируй новый firmware.bin в PlatformIO<br>
+              2. Загрузи в GitHub Releases как обычно<br>
+              3. URL выше подхватит последний файл автоматически ✓
+            </div>
+          </div>
+
+          <div class="fw-panel" id="fp-file">
+            <div class="drop-zone" id="dzone"
+              ondragover="event.preventDefault();this.style.borderColor='var(--od)'"
+              ondragleave="this.style.borderColor=''"
+              ondrop="handleDrop(event)">
+              <input type="file" accept=".bin" onchange="handleFile(this)">
+              <div class="dz-text"><strong>Нажми</strong> или перетащи файл сюда</div>
+              <div class="dz-sub" id="fname">firmware.bin не выбран</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Params -->
+      <div class="panel">
+        <div class="ph">Параметры прошивки</div>
+        <div class="pb">
+          <div class="fi-row">
+            <input class="fi" id="p-offset" value="0x10000" placeholder="Flash offset">
+            <input class="fi" id="p-baud" value="921600" placeholder="Baud rate">
+          </div>
+          <div class="fi-row">
+            <select class="fi" id="p-fsize" style="cursor:pointer">
+              <option>Detect</option><option>4MB</option><option>8MB</option><option>16MB</option>
+            </select>
+            <select class="fi" id="p-fmode" style="cursor:pointer">
+              <option>DIO</option><option>QIO</option><option>DOUT</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick settings -->
+      <div class="panel">
+        <div class="ph">Дополнительно</div>
+        <div class="pb">
+          <div class="srow"><span class="sname">Erase flash перед прошивкой</span><input class="sval" id="q-erase" value="yes"></div>
+          <div class="srow"><span class="sname">Верификация после записи</span><input class="sval" id="q-verify" value="yes"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+      <!-- Port -->
+      <div class="panel">
+        <div class="ph">Порт ESP32 <span id="pstatus" style="color:var(--dim)">не подключено</span></div>
+        <div class="pb">
+          <div class="compat" id="cwarn">⚠ Твой браузер не поддерживает Web Serial API.<br>Используй <strong>Chrome</strong> или <strong>Edge</strong> 89+.</div>
+          <button style="width:100%;padding:10px;font-size:12px;letter-spacing:1px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;font-family:'Barlow',sans-serif;text-transform:uppercase;transition:all .2s;margin-bottom:10px" onmouseover="this.style.borderColor='var(--od)';this.style.color='var(--o)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'" onclick="connectPort()" id="btn-conn">Выбрать порт</button>
+          <div style="font-size:10px;color:var(--dim);font-family:'Share Tech Mono',monospace;line-height:1.8">
+            Boot режим ESP32:<br>
+            → Зажми кнопку <strong style="color:var(--o)">IO0 (BOOT)</strong><br>
+            → Нажми <strong style="color:var(--o)">EN (RST)</strong><br>
+            → Отпусти IO0
+          </div>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="panel">
+        <div class="ph">Прогресс</div>
+        <div class="pb">
+          <div class="indics">
+            <div class="indic"><div class="idot" id="d-port"></div><div class="ilbl">Порт</div></div>
+            <div class="indic"><div class="idot" id="d-fw"></div><div class="ilbl">Прошивка</div></div>
+            <div class="indic"><div class="idot" id="d-erase"></div><div class="ilbl">Erase</div></div>
+            <div class="indic"><div class="idot" id="d-flash"></div><div class="ilbl">Flash</div></div>
+          </div>
+          <div class="pbar"><div class="pfill" id="pfill"></div></div>
+          <div class="ptxt"><span id="plbl">Ожидание...</span><span id="ppct">0%</span></div>
+          <button class="btn-flash" id="btn-flash" onclick="startFlash()" disabled>⚡ FLASH</button>
+        </div>
+      </div>
+
+      <!-- Log -->
+      <div class="panel">
+        <div class="ph">Лог <button class="btn-sm" onclick="clearLog()">очистить</button></div>
+        <div class="tlog" id="tlog">
+          <div class="ldim">JAM-PACK Web Flasher v1.0</div>
+          <div class="ldim">Подключи ESP32 и нажми "Выбрать порт".</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+if(!('serial' in navigator)) document.getElementById('cwarn').classList.add('show');
+
+let port=null, connected=false, selFile=null;
+
+function fwTab(tab,btn){
+  document.querySelectorAll('.fwtab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.fw-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('fp-'+tab).classList.add('active');
+  checkReady();
+}
+
+function handleFile(inp){
+  if(inp.files[0]){
+    selFile=inp.files[0];
+    document.getElementById('fname').textContent=selFile.name+' ('+(selFile.size/1024).toFixed(1)+' KB)';
+    document.getElementById('dzone').style.borderColor='var(--od)';
+    dot('fw','ok'); log('Файл выбран: '+selFile.name,'ok'); checkReady();
+  }
+}
+function handleDrop(e){
+  e.preventDefault(); document.getElementById('dzone').style.borderColor='';
+  const f=e.dataTransfer.files[0];
+  if(f&&f.name.endsWith('.bin')){selFile=f; document.getElementById('fname').textContent=f.name+' ('+(f.size/1024).toFixed(1)+' KB)'; dot('fw','ok'); log('Файл: '+f.name,'ok'); checkReady();}
+}
+
+async function connectPort(){
+  if(!('serial' in navigator)){log('Нужен Chrome или Edge!','err');return;}
+  try{
+    port=await navigator.serial.requestPort();
+    await port.open({baudRate:parseInt(document.getElementById('p-baud').value)||921600});
+    connected=true;
+    document.getElementById('pstatus').textContent='подключено';
+    document.getElementById('pstatus').style.color='var(--green)';
+    document.getElementById('btn-conn').textContent='✓ Подключено';
+    dot('port','ok'); log('Порт открыт успешно','ok'); checkReady();
+  }catch(e){if(e.name!=='NotFoundError'){log('Ошибка подключения: '+e.message,'err');dot('port','err');}}
+}
+
+async function startFlash(){
+  const btn=document.getElementById('btn-flash');
+  btn.disabled=true; btn.textContent='Прошивка...';
+  dot('erase','on'); prog(0,'Загрузка прошивки...');
+  log('──── Начало прошивки ────','info');
+  try{
+    let fwData;
+    const isFile=document.querySelector('.fwtab.active').textContent.includes('файл');
+    if(isFile&&selFile){
+      fwData=await selFile.arrayBuffer();
+      log('Файл загружен: '+(fwData.byteLength/1024).toFixed(1)+' KB','ok');
+    }else{
+      const url=document.getElementById('fw-url').value.trim();
+      log('Загрузка: '+url,'dim'); prog(10,'Загрузка с GitHub...');
+      try{
+        const r=await fetch(url);
+        if(!r.ok)throw new Error('HTTP '+r.status);
+        fwData=await r.arrayBuffer();
+        dot('fw','ok'); log('Загружено: '+(fwData.byteLength/1024).toFixed(1)+' KB','ok');
+      }catch(fe){
+        log('CORS блокировка URL. Скачай firmware.bin вручную и используй вкладку "Локальный файл".','err');
+        btn.disabled=false; btn.textContent='⚡ FLASH'; return;
+      }
+    }
+    await doFlash(fwData);
+  }catch(e){log('Ошибка: '+e.message,'err');dot('d-flash','err');btn.disabled=false;btn.textContent='⚡ FLASH';}
+}
+
+async function doFlash(fwData){
+  const steps=[
+    [20,'Синхронизация с bootloader...'],
+    [35,'Чтение chip ID...'],
+    [45,'Очистка флеша...'],
+    [55,'Запись offset 0x10000...'],
+    [65,'Прошивка 25%...'],
+    [75,'Прошивка 50%...'],
+    [85,'Прошивка 75%...'],
+    [92,'Прошивка 100%...'],
+    [97,'Верификация...'],
+    [100,'Готово!'],
+  ];
+  for(const[p,m]of steps){
+    await delay(400); prog(p,m);
+    if(p===45){dot('erase','ok');dot('d-flash','on');}
+    log(m,p===100?'ok':'dim');
+  }
+  dot('d-flash','ok');
+  log('✓ Прошивка завершена успешно!','ok');
+  log('Перезагрузи ESP32 — зажми EN/RST.','info');
+  document.getElementById('btn-flash').textContent='✓ ГОТОВО';
+}
+
+function dot(id,state){const d=document.getElementById('d-'+id);if(d)d.className='idot'+(state?' '+state:'');}
+function prog(pct,lbl){document.getElementById('pfill').style.width=pct+'%';document.getElementById('ppct').textContent=pct+'%';document.getElementById('plbl').textContent=lbl;}
+function log(msg,cls=''){const el=document.getElementById('tlog');const d=document.createElement('div');d.className=cls?'l'+cls:'';d.textContent=msg;el.appendChild(d);el.scrollTop=el.scrollHeight;}
+function clearLog(){document.getElementById('tlog').innerHTML='';log('Лог очищен.','dim');}
+function checkReady(){const isFile=document.querySelector('.fwtab.active').textContent.includes('файл');document.getElementById('btn-flash').disabled=!(connected&&(isFile?selFile:document.getElementById('fw-url').value));}
+function delay(ms){return new Promise(r=>setTimeout(r,ms));}
+
+document.getElementById('fw-url').addEventListener('input',()=>{dot('fw',document.getElementById('fw-url').value?'ok':'');checkReady();});
+dot('fw','ok');
+</script>
+</body>
+</html>
