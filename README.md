@@ -1,14 +1,37 @@
 <div align="center">
 
+```
+     ██╗ █████╗ ███╗   ███╗      ██████╗  █████╗  ██████╗██╗  ██╗
+     ██║██╔══██╗████╗ ████║      ██╔══██╗██╔══██╗██╔════╝██║ ██╔╝
+     ██║███████║██╔████╔██║█████╗██████╔╝███████║██║     █████╔╝ 
+██   ██║██╔══██║██║╚██╔╝██║╚════╝██╔═══╝ ██╔══██║██║     ██╔═██╗ 
+╚█████╔╝██║  ██║██║ ╚═╝ ██║      ██║     ██║  ██║╚██████╗██║  ██╗
+ ╚════╝ ╚═╝  ╚═╝╚═╝     ╚═╝      ╚═╝     ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
+```
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  root@esp32:~$ ./jampack --list-modules                         │
+│                                                                 │
+│  [✓] WiFi      — Deauther · Beacon Spam · EvilPortal · Wdrive  │
+│  [✓] Bluetooth — BLE Spam iOS / Android / Win · BadBLE         │
+│  [✓] SubGHz    — Read · Send · Analyzer · Bruteforce           │
+│  [✓] Infrared  — Send · Read · TV/PJ/AC OFF (97 codes)         │
+│  [✓] GPIO      — iButton · NRF24 Spectrum · Serial             │
+│  [✓] Settings  — Contrast · Standby · About                    │
+│                                                                 │
+│  root@esp32:~$ █                                                │
+└─────────────────────────────────────────────────────────────────┘
+```
+
 # 📡 JAM-PACK
+**Ultimate ESP32 Firmware · v1.1.0**
 
-**Ultimate ESP32 Firmware · v1.0.0 · BETA**
-
-[![Version](https://img.shields.io/badge/version-1.0.0-ff8c00?style=for-the-badge&logo=arduino&logoColor=white)](https://github.com)
-[![Status](https://img.shields.io/badge/status-BETA-red?style=for-the-badge&logoColor=white)](https://github.com)
-[![Platform](https://img.shields.io/badge/platform-ESP32-ff6600?style=for-the-badge&logo=espressif&logoColor=white)](https://github.com)
-[![Framework](https://img.shields.io/badge/framework-Arduino-00979d?style=for-the-badge&logo=arduino&logoColor=white)](https://github.com)
-[![License](https://img.shields.io/badge/license-MIT-brightgreen?style=for-the-badge)](https://github.com)
+[![Version](https://img.shields.io/badge/version-1.1.0-ff8c00?style=for-the-badge&logo=arduino&logoColor=white)](https://github.com/kes229229/JAM-PACK)
+[![Status](https://img.shields.io/badge/status-RELEASE-brightgreen?style=for-the-badge&logoColor=white)](https://github.com/kes229229/JAM-PACK)
+[![Platform](https://img.shields.io/badge/platform-ESP32-ff6600?style=for-the-badge&logo=espressif&logoColor=white)](https://github.com/kes229229/JAM-PACK)
+[![Framework](https://img.shields.io/badge/framework-Arduino-00979d?style=for-the-badge&logo=arduino&logoColor=white)](https://github.com/kes229229/JAM-PACK)
+[![License](https://img.shields.io/badge/license-MIT-brightgreen?style=for-the-badge)](https://github.com/kes229229/JAM-PACK)
 
 </div>
 
@@ -18,8 +41,6 @@
 
 **JAM-PACK** — мощная универсальная прошивка для **ESP32** с дисплеем **SSD1306 128×64**.  
 Объединяет инструменты для исследования WiFi, Bluetooth, SubGHz, Infrared и GPIO в одном устройстве.
-
-> 🚧 **BETA версия** — прошивка находится в активной разработке. Возможны баги и недоработки.
 
 > ⚠️ **Только для образовательных и исследовательских целей.** Используй в соответствии с законами своего региона.
 
@@ -91,7 +112,7 @@
 <td>
 
 **⚙ Settings**
-- Display Color
+- Contrast
 - Standby Time
 - About
 
@@ -114,13 +135,13 @@
    1    → GND                  IR-T → G12
    2    → 3V3                  IR-R → G14
    3    → G4
-   4    → G15              
-   5    → G18                  
-   6    → G23                  
-   7    → G19                  
-                               
-💾 SD Card                    
-   3V3  → 3V3    
+   4    → G15
+   5    → G18
+   6    → G23
+   7    → G19
+
+💾 SD Card
+   3V3  → 3V3
    CS   → G5
    MOSI → G23
    CLK  → G18
@@ -132,8 +153,7 @@
 
 <div align="center">
 
-**JAM-PACK · Ultimate Edition · v1.0.0 · 2026**
-
+**JAM-PACK · Ultimate Edition · v1.1.0 · 2026**  
 *ESP32 · SSD1306 · CC1101 · NRF24 · IR · BLE*
 
 </div>
