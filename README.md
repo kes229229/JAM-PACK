@@ -17,7 +17,7 @@
 │  [✓] Bluetooth — BLE Spam iOS / Android / Win · BadBLE         │
 │  [✓] SubGHz    — Read · Send · Analyzer · Bruteforce           │
 │  [✓] Infrared  — Send · Read · TV/PJ/AC OFF (97 codes)         │
-│  [✓] GPIO      — iButton · NRF24 Spectrum          │
+│  [✓] GPIO      — iButton · NRF24 Spectrum · Serial             │
 │  [✓] Settings  — Contrast · Standby · About                    │
 │                                                                 │
 │  root@esp32:~$ █                                                │
